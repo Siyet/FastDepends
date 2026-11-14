@@ -205,22 +205,22 @@ def test_schema_hook_preserves_nested_struct_metadata(path):
             )
 
         def use(self, **kwargs):
-            pytest.fail("Custom field executed during schema generation")
+            raise AssertionError("Custom field executed during schema generation")
 
     factory = MsgSpecSerializer(schema_hook=schema)
     if path in ("dependency", "grouped"):
 
         def dependency(payload: Envelope):
-            pytest.fail("Dependency executed during schema generation")
+            raise AssertionError("Dependency executed during schema generation")
 
         if path == "dependency":
 
             def handler(value=Depends(dependency)):
-                pytest.fail("Handler executed during schema generation")
+                raise AssertionError("Handler executed during schema generation")
         else:
 
             def handler(payload: Annotated[Envelope, Header()]):
-                pytest.fail("Handler executed during schema generation")
+                raise AssertionError("Handler executed during schema generation")
 
         call = build_call_model(
             handler, dependency_provider=Provider(), serializer_cls=factory
